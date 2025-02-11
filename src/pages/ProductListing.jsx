@@ -16,46 +16,20 @@ import { FiEye, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../hooks/useCart";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "../services/ProductService";
 
 const ProductListing = ({ searchQuery, selectedCategory, sortOrder }) => {
   const { addToCart } = useCart();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  const products = [
-    {
-      id: 1,
-      name: "Fresh Tomato",
-      category: "Grocery",
-      image: "https://placehold.co/400x500",
-      rating: 4.5,
-      price: 2.99,
-    },
-    {
-      id: 2,
-      name: "Big Discount on Red Onion",
-      category: "Grocery",
-      image: "https://placehold.co/400x500",
-      rating: 4.0,
-      price: 1.99,
-    },
-    {
-      id: 3,
-      name: "Chilli",
-      category: "Grocery",
-      image: "https://placehold.co/400x500",
-      rating: 3.5,
-      price: 3.49,
-    },
-    {
-      id: 4,
-      name: "Fresh Carrot",
-      category: "Grocery",
-      image: "https://placehold.co/400x500",
-      rating: 5.0,
-      price: 2.49,
-    },
-  ];
+  const { data: products } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+  });
+
+  console.log(products);
 
   const handleOpen = () => {
     setOpen(true);
@@ -64,7 +38,7 @@ const ProductListing = ({ searchQuery, selectedCategory, sortOrder }) => {
     setOpen(false);
   };
 
-  const filteredProducts = products
+  const filteredProducts = products.content
     .filter(
       (product) =>
         selectedCategory === "All Categories" ||

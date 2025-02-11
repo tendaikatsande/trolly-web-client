@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await api.post("/refresh", {
+      const response = await api.post("/api/auth/refresh", {
         refresh_token: refreshToken,
       });
       const { access_token } = response.data;
@@ -35,7 +35,7 @@ const AuthProvider = ({ children }) => {
   const getUser = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/profile");
+      const response = await api.get("/api/auth/profile");
       setUser(response.data);
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -43,7 +43,7 @@ const AuthProvider = ({ children }) => {
         const newAccessToken = await refreshAccessToken();
         if (newAccessToken) {
           // Retry the request with the new access token
-          const retryResponse = await api.get("/profile");
+          const retryResponse = await api.get("/api/auth/profile");
           setUser(retryResponse.data);
         }
       } else {
@@ -62,7 +62,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const loginWithEmailAndPassword = ({ username, password }) => {
-    return api.post("/login", { username, password });
+    return api.post("/api/auth/login", { username, password });
   };
 
   const getUserRoles = () => {
