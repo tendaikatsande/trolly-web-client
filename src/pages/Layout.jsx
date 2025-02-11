@@ -13,6 +13,7 @@ import { FiShoppingBag, FiUser } from "react-icons/fi";
 import CartDrawer from "./CartDrawer";
 import { Outlet } from "react-router";
 import { useCart } from "../hooks/useCart";
+import { useQuery } from "@tanstack/react-query";
 
 // Styled components
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -37,7 +38,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 // Main Layout Component
 const Layout = () => {
   const [cartOpen, setCartOpen] = useState(false);
-  const { cart, cartTotal, cartCount } = useCart();
+  const { cartCount } = useCart();
 
   return (
     <Box>

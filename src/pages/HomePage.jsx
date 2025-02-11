@@ -18,20 +18,27 @@ import { FiSearch } from "react-icons/fi";
 import { BiSortDown, BiSortUp } from "react-icons/bi";
 import ProductListing from "./ProductListing";
 import { useTheme } from "@mui/material/styles"; // Added useTheme for theme awareness
+import { getCategories } from "../services/CategoryService";
+import { useQuery } from "@tanstack/react-query";
 
 const HomePage = () => {
-  const categories = [
-    "All Categories",
-    "Grocery",
-    "Beauty & Makeup",
-    "Electronics",
-    "Furniture",
-    "Fashion",
-    "Bakery",
-  ];
+  const [page, setPage] = useState(0);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [selectedCategory, setSelectedCategory] = useState();
   const [sortOrder, setSortOrder] = useState("asc");
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["categories", page],
+    queryFn: () =>
+      getCategories({
+        page,
+        size: 10,
+        sort: [],
+      }),
+
+    keepPreviousData: true,
+  });
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Example breakpoint
@@ -91,9 +98,9 @@ const HomePage = () => {
                 label="Category" // Make sure label matches labelId
                 sx={{ bgcolor: "white" }} // Keep background white
               >
-                {categories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
+                {data?.data?.content.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
                   </MenuItem>
                 ))}
               </Select>
