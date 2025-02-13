@@ -18,7 +18,7 @@ import { useLocation, useNavigate } from "react-router";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const { login, setTokens } = useAuth();
+  const { login, setTokens, getUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const {
@@ -40,6 +40,7 @@ const Login = () => {
       // Set tokens on successful login
       setError();
       setTokens(data.data);
+      getUser();
 
       if (location.pathname === "/login") navigate("/");
     },

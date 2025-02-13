@@ -28,7 +28,7 @@ const Register = () => {
     formState: { errors, isSubmitting }, // form state and errors
   } = useForm();
 
-  const { register: registerUser, setTokens } = useAuth();
+  const { register: registerUser, setTokens, getUser } = useAuth();
 
   const mutation = useMutation({
     mutationFn: (data) =>
@@ -49,6 +49,7 @@ const Register = () => {
       // Handle success (e.g., redirect to login or dashboard)
       // Set tokens on successful login
       setTokens(data.data);
+      getUser();
       if (location.pathname === "/register") navigate("/");
       alert("Registration successful!");
     },

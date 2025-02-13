@@ -48,6 +48,7 @@ const AuthProvider = ({ children }) => {
         }
       } else {
         console.error("Error fetching user profile:", error);
+        setUser();
       }
     } finally {
       setLoading(false);

@@ -12,6 +12,7 @@ import ProductView from "./pages/ProductView";
 import { CartProvider } from "./hooks/CartProvider";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import UserAccount from "./pages/UserAccount";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -53,6 +54,11 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <Register />,
+      },
+
+      {
+        path: "profile",
+        element: <UserAccount />,
       },
 
       {
