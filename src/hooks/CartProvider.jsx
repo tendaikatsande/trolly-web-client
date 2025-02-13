@@ -52,6 +52,15 @@ const CartProvider = ({ children }) => {
     );
   };
 
+  const getProductQuantity = useMemo(
+    () => (productId) => {
+      if (!productId) return 0; // Or handle the error appropriately
+      const item = cart.find((item) => item.id === productId);
+      return item ? item.quantity : 0;
+    },
+    [cart]
+  );
+
   const cartCount = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity, 0),
     [cart]
@@ -71,8 +80,9 @@ const CartProvider = ({ children }) => {
       removeFromCart,
       increaseQuantity,
       reduceQuantity,
+      getProductQuantity,
     }),
-    [cart, cartCount, cartTotal]
+    [cart, cartCount, cartTotal, getProductQuantity]
   );
 
   return (

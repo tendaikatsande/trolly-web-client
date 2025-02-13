@@ -73,14 +73,10 @@ const CartDrawer = ({ open, onClose }) => {
             <Button
               fullWidth
               variant="contained"
-              color="success"
               sx={{ mb: 1 }}
-              href="checkout"
+              href="../checkout"
             >
               Checkout Now (${cartTotal.toFixed(2)})
-            </Button>
-            <Button fullWidth variant="outlined">
-              View Cart
             </Button>
           </Box>
         )}

@@ -10,24 +10,51 @@ import {
   IconButton,
 } from "@mui/material";
 import { FiEye, FiEyeOff, FiShoppingBag } from "react-icons/fi";
-import { FaFacebook, FaGoogle } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { useAuth } from "../hooks/useAuth";
+import { useForm } from "react-hook-form"; // Import React Hook Form
+import { useMutation } from "@tanstack/react-query"; // Import useMutation
+import { useLocation, useNavigate } from "react-router";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { login, setTokens } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      toast.error("Please fill in all fields.");
-    } else {
-      setError("");
-      toast.success("Logged in successfully!");
-      // Add your login logic here
-    }
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      // Perform login using data (email, password)
+      const response = await login({
+        email: data.email,
+        password: data.password,
+      });
+      return response; // Return the response
+    },
+    onSuccess: (data) => {
+      // Set tokens on successful login
+      setError();
+      setTokens(data.data);
+
+      if (location.pathname === "/login") navigate("/");
+    },
+    onError: (error) => {
+      // Handle login error
+      setError(
+        error?.response.data.message ||
+          "Login failed. Please check your credentials."
+      );
+    },
+  });
+
+  const onSubmit = async (data) => {
+    // Trigger the mutation
+    mutation.mutate(data);
   };
 
   return (
@@ -42,20 +69,30 @@ const Login = () => {
       >
         <FiShoppingBag size={40} />
         <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
-          Welcome To Bazaar
+          Welcome To Trolley
         </Typography>
-        <Box component="form" sx={{ mt: 3, width: "100%" }}>
+        <Box
+          component="form"
+          sx={{ mt: 3, width: "100%" }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Email or Phone Number"
+            label="Email"
             name="email"
             autoComplete="email"
             placeholder="example@mail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!error}
+            {...register("email", {
+              required: "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            })}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
           <TextField
             margin="normal"
@@ -65,10 +102,9 @@ const Login = () => {
             label="Password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!error}
-            helperText={error}
+            {...register("password", { required: "Password is required" })}
+            error={!!errors.password}
+            helperText={errors.password?.message}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -88,42 +124,21 @@ const Login = () => {
               bgcolor: "#e41749",
               "&:hover": { bgcolor: "#d4163e" },
             }}
-            onClick={handleLogin}
+            type="submit"
+            disabled={isSubmitting || mutation.isLoading} // Disable when submitting or mutating
           >
             Login
           </Button>
-          <Box sx={{ textAlign: "center", my: 2 }}>
-            <Typography color="text.secondary">or</Typography>
-          </Box>
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<FaFacebook />}
-            sx={{
-              mb: 2,
-              bgcolor: "#3b5998",
-              "&:hover": { bgcolor: "#344e86" },
-            }}
-          >
-            Continue With Facebook
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<FaGoogle />}
-            sx={{
-              mb: 2,
-              bgcolor: "#4285f4",
-              "&:hover": { bgcolor: "#3367d6" },
-            }}
-          >
-            Continue With Google
-          </Button>
+
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="body2">
                 Don't have an account?{" "}
-                <Button color="primary" sx={{ p: 0, textTransform: "none" }}>
+                <Button
+                  color="primary"
+                  sx={{ p: 0, textTransform: "none" }}
+                  href="register"
+                >
                   Register
                 </Button>
               </Typography>
@@ -134,6 +149,11 @@ const Login = () => {
               </Button>
             </Grid>
           </Grid>
+          {error && (
+            <Typography color="error" variant="body2">
+              {error}
+            </Typography>
+          )}
         </Box>
       </Box>
     </Container>

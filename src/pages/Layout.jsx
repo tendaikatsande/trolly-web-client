@@ -8,12 +8,14 @@ import {
   styled,
   Container,
   Typography,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { FiShoppingBag, FiUser } from "react-icons/fi";
 import CartDrawer from "./CartDrawer";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { useCart } from "../hooks/useCart";
-import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../hooks/useAuth";
 
 // Styled components
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -39,6 +41,32 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const Layout = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const { cartCount } = useCart();
+  const { user } = useAuth();
+  const [anchorEl, setAnchorEl] = useState(null); // Anchor element for the menu
+  const open = Boolean(anchorEl); // Boolean to control menu open state
+  const navigate = useNavigate(); // Initialize navigate
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProfileClick = () => {
+    handleClose();
+    navigate("/profile"); // Navigate to the profile route
+  };
+
+  const handleLoginClick = () => {
+    handleClose();
+    navigate("/login"); // Navigate to the login route
+  };
+
+  const handleSettingsClick = () => {
+    handleClose();
+    navigate("/settings"); // Navigate to the settings route
+  };
 
   return (
     <Box>
@@ -48,10 +76,32 @@ const Layout = () => {
             Trolley
           </Typography>
           <Box sx={{ flexGrow: 1, ml: 2 }}></Box>
-          <Box sx={{ ml: 2 }}>
-            <IconButton>
+          <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
+            <IconButton
+              id="basic-button"
+              aria-controls={open ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClick}
+            >
               <FiUser />
             </IconButton>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <MenuItem onClick={handleLoginClick}>Login</MenuItem>
+              {user?.email && (
+                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+              )}
+
+              <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
+            </Menu>
             <IconButton onClick={() => setCartOpen(true)}>
               <StyledBadge badgeContent={cartCount}>
                 <FiShoppingBag />

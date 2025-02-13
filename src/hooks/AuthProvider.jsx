@@ -48,21 +48,18 @@ const AuthProvider = ({ children }) => {
         }
       } else {
         console.error("Error fetching user profile:", error);
-        localStorage.clear();
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const login = () => {
-    setLoading(true);
-    localStorage.clear();
-    window.location.href = import.meta.env.VITE_LOGIN_URL;
+  const login = ({ email, password }) => {
+    return api.post("/api/auth/login", { email, password });
   };
 
-  const loginWithEmailAndPassword = ({ username, password }) => {
-    return api.post("/api/auth/login", { username, password });
+  const register = (payload) => {
+    return api.post("/api/auth/register", payload);
   };
 
   const getUserRoles = () => {
@@ -73,14 +70,14 @@ const AuthProvider = ({ children }) => {
   const isClient = () => getUserRoles().includes("ROLE_CLIENT");
 
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     setUser(null);
   };
 
-  const setTokens = ({ access_token, refresh_token }) => {
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("refresh_token", refresh_token);
+  const setTokens = ({ token, refreshToken }) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("refreshToken", refreshToken);
   };
 
   const authValue = useMemo(
@@ -88,8 +85,8 @@ const AuthProvider = ({ children }) => {
       user,
       loading,
       login,
+      register,
       logout,
-      loginWithEmailAndPassword,
       getUser,
       setTokens,
       refreshAccessToken,

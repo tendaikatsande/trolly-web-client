@@ -10,6 +10,8 @@ import Checkout from "./pages/Checkout";
 import HomePage from "./pages/HomePage";
 import ProductView from "./pages/ProductView";
 import { CartProvider } from "./hooks/CartProvider";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -41,6 +43,16 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <HomePage />,
+      },
+
+      {
+        path: "login",
+        element: <Login />,
+      },
+
+      {
+        path: "register",
+        element: <Register />,
       },
 
       {

@@ -16,4 +16,8 @@ const getProducts = (
     },
   });
 };
-export { getProducts };
+
+const getProduct = (id) => {
+  return api.get(`${SERVICE_URL}/${id}`);
+};
+export { getProducts, getProduct };
