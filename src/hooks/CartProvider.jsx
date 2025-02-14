@@ -12,6 +12,11 @@ const CartProvider = ({ children }) => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  //empty cart
+  const emptyCart = () => {
+    setCart([]);
+  };
+
   const addToCart = (product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
@@ -81,6 +86,7 @@ const CartProvider = ({ children }) => {
       increaseQuantity,
       reduceQuantity,
       getProductQuantity,
+      emptyCart,
     }),
     [cart, cartCount, cartTotal, getProductQuantity]
   );

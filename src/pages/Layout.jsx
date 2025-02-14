@@ -95,6 +95,10 @@ const Layout = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, ml: 2 }}></Box>
           <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
+            {user?.email && (
+              <MenuItem onClick={() => navigate("orders")}>My Orders </MenuItem>
+            )}
+
             <Tooltip title={user?.email ? "Open User Menu" : "Login"}>
               <IconButton
                 id="basic-button"

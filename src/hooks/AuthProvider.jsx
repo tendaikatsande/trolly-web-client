@@ -37,6 +37,7 @@ const AuthProvider = ({ children }) => {
     try {
       const response = await api.get("/api/auth/profile");
       setUser(response.data);
+      localStorage.setItem("user", response.data.id);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Token might be expired, try to refresh it
@@ -45,6 +46,7 @@ const AuthProvider = ({ children }) => {
           // Retry the request with the new access token
           const retryResponse = await api.get("/api/auth/profile");
           setUser(retryResponse.data);
+          localStorage.setItem("user", retryResponse.data.id);
         }
       } else {
         console.error("Error fetching user profile:", error);

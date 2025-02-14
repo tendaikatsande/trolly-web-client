@@ -13,6 +13,8 @@ import { CartProvider } from "./hooks/CartProvider";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserAccount from "./pages/UserAccount";
+import ViewOrder from "./pages/ViewOrder";
+import OrdersPage from "./pages/OrdersPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -70,6 +72,16 @@ const router = createBrowserRouter([
         path: "checkout",
         index: true,
         element: <Checkout />,
+      },
+      {
+        path: "order/:orderId",
+        index: true,
+        element: <ViewOrder />,
+      },
+      {
+        path: "orders",
+        index: true,
+        element: <OrdersPage />,
       },
     ],
   },
