@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { cancelOrder, getOrders } from "../services/OrderService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -23,6 +23,10 @@ const OrdersPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(3);
+  const [allOrders, setAllOrders] = useState([]); // To accumulate orders
+
   // Notification state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -30,13 +34,31 @@ const OrdersPage = () => {
 
   // Fetch orders
   const {
-    data: orders,
+    data: ordersData,
     isLoading,
     error,
+    isFetchingNextPage,
   } = useQuery({
-    queryKey: ["orders"],
-    queryFn: getOrders,
+    queryKey: ["orders", page, pageSize],
+    queryFn: () => getOrders({ page, size: pageSize }),
+    keepPreviousData: true, // keep the data from the previous page while fetching the next one
   });
+
+  const handleLoadMore = useCallback(() => {
+    setPage((prevPage) => prevPage + 1); // Increment page number
+  }, []);
+
+  // Update allOrders when new data is available
+  useEffect(() => {
+    if (ordersData?.data?.content) {
+      setAllOrders((prevOrders) => {
+        const newOrders = ordersData.data.content.filter(
+          (order) => !prevOrders.find((prevOrder) => prevOrder.id === order.id)
+        );
+        return [...prevOrders, ...newOrders];
+      });
+    }
+  }, [ordersData?.data?.content]);
 
   // Cancel order mutation
   const cancelOrderMutation = useMutation({
@@ -66,8 +88,8 @@ const OrdersPage = () => {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "pending":
-        return "warning";
-      case "completed":
+        return "info";
+      case "confirmed":
         return "success";
       case "cancelled":
         return "error";
@@ -76,18 +98,18 @@ const OrdersPage = () => {
     }
   };
 
-  const parseDate = (d) => {
-    return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5]);
-  };
-
   return (
     <Container sx={{ mt: 4, pb: 4 }}>
       <Typography variant="h4" gutterBottom>
         Your Orders
       </Typography>
-
+      {ordersData?.data?.totalElements !== undefined && (
+        <Typography variant="subtitle1" gutterBottom>
+          Total Orders: {ordersData.data.totalElements}
+        </Typography>
+      )}
       {/* Loading & Error Handling */}
-      {isLoading && (
+      {isLoading && page === 0 && (
         <Box display="flex" flexDirection="column" gap={2}>
           {[1, 2, 3].map((_, index) => (
             <Skeleton
@@ -106,12 +128,12 @@ const OrdersPage = () => {
       )}
 
       {/* Orders List & Details */}
-      {!isLoading && !error && orders && (
+      {!isLoading && !error && (
         <List>
-          {orders.data?.length === 0 ? (
+          {allOrders.length === 0 && !isLoading ? (
             <Typography>No orders found.</Typography>
           ) : (
-            orders.data.content.map((order, index) => (
+            allOrders.map((order, index) => (
               <Box key={order.id}>
                 <ListItem
                   sx={{
@@ -154,7 +176,13 @@ const OrdersPage = () => {
                     >
                       View Details
                     </Button>
-                    {order.status.toLowerCase() !== "cancelled" && (
+                    {![
+                      "WAITING_FOR_PAYMENT",
+                      "CREATED",
+                      "CONFIRMED",
+                      "DELIVERED",
+                      "CANCELLED",
+                    ].includes(order.status) && (
                       <Button
                         size="small"
                         color="error"
@@ -170,11 +198,26 @@ const OrdersPage = () => {
                     )}
                   </Box>
                 </ListItem>
-                {index !== orders.data.length - 1 && <Divider />}
+                {index !== allOrders.length - 1 && <Divider />}
               </Box>
             ))
           )}
         </List>
+      )}
+
+      {/* Conditionally render the Load More button */}
+      {ordersData?.data?.last === false && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Button
+            onClick={handleLoadMore}
+            disabled={isFetchingNextPage}
+            startIcon={
+              isFetchingNextPage ? <CircularProgress size={16} /> : null
+            }
+          >
+            Load More
+          </Button>
+        </Box>
       )}
 
       {/* Snackbar Notifications */}

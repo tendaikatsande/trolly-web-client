@@ -20,4 +20,20 @@ const getProducts = (
 const getProduct = (id) => {
   return api.get(`${SERVICE_URL}/${id}`);
 };
-export { getProducts, getProduct };
+
+const addProduct = (formData) => {
+  return api.post("/api/products", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+const updateProduct = (id, formData) => {
+  return api.put(`/api/products/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+const deleteProduct = (id) => {
+  return api.delete(`/api/products/${id}`);
+};
+export { getProducts, getProduct, addProduct, updateProduct, deleteProduct };

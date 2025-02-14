@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import UserAccount from "./pages/UserAccount";
 import ViewOrder from "./pages/ViewOrder";
 import OrdersPage from "./pages/OrdersPage";
+import ProductsManager from "./pages/ProductsManager";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -82,6 +83,11 @@ const router = createBrowserRouter([
         path: "orders",
         index: true,
         element: <OrdersPage />,
+      },
+      {
+        path: "products",
+        index: true,
+        element: <ProductsManager />,
       },
     ],
   },

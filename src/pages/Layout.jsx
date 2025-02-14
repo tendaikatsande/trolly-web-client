@@ -96,7 +96,14 @@ const Layout = () => {
           <Box sx={{ flexGrow: 1, ml: 2 }}></Box>
           <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
             {user?.email && (
-              <MenuItem onClick={() => navigate("orders")}>My Orders </MenuItem>
+              <>
+                <MenuItem onClick={() => navigate("orders")}>
+                  My Orders{" "}
+                </MenuItem>
+                <MenuItem onClick={() => navigate("products")}>
+                  Products Management{" "}
+                </MenuItem>
+              </>
             )}
 
             <Tooltip title={user?.email ? "Open User Menu" : "Login"}>
